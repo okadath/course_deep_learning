@@ -204,43 +204,60 @@ now	=	datetime.utcnow().strftime("%Y%m%d%H%M%S")
 root_logdir	=	"tf_logs"
 logdir	=	"{}/run-{}/".format(root_logdir,	now)
 
-reset_graph() 
-batch_size = 10000
-n_batches = int(np.ceil(m / batch_size))
-print(n_batches)
-n_epochs = 1000
-learning_rate = 0.01
+# reset_graph() 
+# batch_size = 10000
+# n_batches = int(np.ceil(m / batch_size))
+# print(n_batches)
+# n_epochs = 1000
+# learning_rate = 0.01
 
-X = tf.placeholder(tf.float32, shape=(None, n + 1), name="X")
-y = tf.placeholder(tf.float32, shape=(None, 1), name="y")
-theta = tf.Variable(tf.random_uniform([n + 1, 1], -1.0, 1.0, seed=42), name="theta")
-y_pred = tf.matmul(X, theta, name="predictions")
-with	tf.name_scope("loss")	as	scope:
-	error	=	y_pred	-	y
-	mse	=	tf.reduce_mean(tf.square(error),	name="mse")
-optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
-training_op = optimizer.minimize(mse)
+# X = tf.placeholder(tf.float32, shape=(None, n + 1), name="X")
+# y = tf.placeholder(tf.float32, shape=(None, 1), name="y")
+# theta = tf.Variable(tf.random_uniform([n + 1, 1], -1.0, 1.0, seed=42), name="theta")
+# y_pred = tf.matmul(X, theta, name="predictions")
+# with	tf.name_scope("loss")	as	scope:
+# 	error	=	y_pred	-	y
+# 	mse	=	tf.reduce_mean(tf.square(error),	name="mse")
+# optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
+# training_op = optimizer.minimize(mse)
 
-init = tf.global_variables_initializer()
-mse_summary = tf.summary.scalar('MSE', mse)
-file_writer = tf.summary.FileWriter(logdir, tf.get_default_graph())
+# init = tf.global_variables_initializer()
+# mse_summary = tf.summary.scalar('MSE', mse)
+# file_writer = tf.summary.FileWriter(logdir, tf.get_default_graph())
 
-#recuperar
-with tf.Session() as sess:
-  sess.run(init)
-  for epoch in range(n_epochs):
+# #recuperar
+# with tf.Session() as sess:
+#   sess.run(init)
+#   for epoch in range(n_epochs):
 
-    for batch_index in range(n_batches):
-      X_batch, y_batch = fetch_batch(epoch, batch_index, batch_size)
-      if batch_index % 100 == 0:
-        summary_str = mse_summary.eval(feed_dict={X: X_batch, y: y_batch})
-        step = epoch * n_batches + batch_index
-        file_writer.add_summary(summary_str, step)
-        print("step", step)
-      sess.run(training_op, feed_dict={X: X_batch, y: y_batch})
+#     for batch_index in range(n_batches):
+#       X_batch, y_batch = fetch_batch(epoch, batch_index, batch_size)
+#       if batch_index % 100 == 0:
+#         summary_str = mse_summary.eval(feed_dict={X: X_batch, y: y_batch})
+#         step = epoch * n_batches + batch_index
+#         file_writer.add_summary(summary_str, step)
+#         print("step", step)
+#       sess.run(training_op, feed_dict={X: X_batch, y: y_batch})
 
-  best_theta = theta.eval()
-  file_writer.close()
-print(best_theta)
+#   best_theta = theta.eval()
+#   file_writer.close()
+# print(best_theta)
 
-         
+#===============================
+reset_graph()
+
+def relu(X):
+  with tf.name_scope("relu"):
+	  w_shape = (int(X.get_shape()[1]), 1) 
+	  print(w_shape)
+	  w = tf.Variable(tf.random_normal(w_shape), name="weights")    # not shown
+	  b = tf.Variable(0.0, name="bias")                             # not shown
+	  z = tf.add(tf.matmul(X, w), b, name="z")                      # not shown
+	  return tf.maximum(z, 0., name="max")      
+n_features = 3
+X = tf.placeholder(tf.float32, shape=(None, n_features), name="X")
+relus = [relu(X) for i in range(5)]
+output = tf.add_n(relus, name="output")
+
+file_writer = tf.summary.FileWriter("logs/relu2", tf.get_default_graph())
+file_writer.close()
