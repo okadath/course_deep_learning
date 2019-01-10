@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/okadath/Desktop/work/tensorflow/asd.ckpt"
+all_model_checkpoint_paths: "/home/okadath/Desktop/work/tensorflow/asd.ckpt"
